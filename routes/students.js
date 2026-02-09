@@ -74,4 +74,27 @@ router.post("/", asyncHandler(async (req, res) => {
   res.status(201).json(data);
 }));
 
+/**
+ * DELETE /api/students/:id
+ * Deletes a student by id (RLS ensures teacher owns it).
+ */
+router.delete("/:id", asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const supabase = req.authSupabase;
+
+  const { error } = await supabase
+    .from("students")
+    .delete()
+    .eq("id", id);
+
+  if (error) {
+    return res.status(500).json({
+      error: "Failed to delete student",
+      message: error.message,
+    });
+  }
+
+  res.status(204).send();
+}));
+
 export default router;
